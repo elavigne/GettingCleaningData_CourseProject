@@ -1,5 +1,6 @@
-library(dplyr)
 library(reshape2)
+library(dplyr)
+library(tidyr)
 
 runAnalysis <- function() {
               containingFolder <- "UCI HAR Dataset"
@@ -61,18 +62,21 @@ runAnalysis <- function() {
               # Calculating the mean of each feature grouped by activity and subject
               df.summarised <- summarise(group_by(df.reshaped, subject, activity, variable), mean=mean(value))
               
-              print("Cleaning up feature names...")
-              df.summarised$variable = gsub('\\.*', '', df.summarised$variable)
+              print("Separating the average mean and the average standard deviation in their own column...")
+              df.separate <- cbind(df.summarised, estimatedValue=sub('^.*(mean|std).*$', "\\1", df.summarised$variable))
+              df.separate$variable = gsub('\\.*|mean|std', '', df.separate$variable)
+              df.separate <- spread(df.separate, estimatedValue, mean)
               
-              df.tidy <- rename(df.summarised, feature=variable)
+              print("Cleaning up feature names...")
+              df.tidy <- rename(df.separate, feature=variable)
+              df.tidy <- rename(df.tidy, avgmean=mean)
+              df.tidy <- rename(df.tidy, avgstd=std)
               df.tidy$feature <- sub('Acc', 'Acceleration', df.tidy$feature)
               df.tidy$feature <- sub('Mag', 'Magnitude', df.tidy$feature)
               df.tidy$feature <- sub('Gyro', 'AngularVelocity', df.tidy$feature)
               df.tidy$feature <- sub('BodyBody', 'Body', df.tidy$feature)
               df.tidy$feature <- sub('^t', 'time', df.tidy$feature)
               df.tidy$feature <- sub('^f', 'frequency', df.tidy$feature)
-              df.tidy$feature <- sub('mean', 'Mean', df.tidy$feature)
-              df.tidy$feature <- sub('std', 'StandardDeviation', df.tidy$feature)
               
               print("Writing final dataset to file 'finalDataset.txt'...")
               write.table(df.tidy, "finalDataset.txt", row.name=FALSE)

@@ -21,6 +21,8 @@ To run the analysis on the data, execute the following:
 ```
 The script will print out to the console the steps it executes.
 
+This script requires that the libraries reshape2, dplyr and tidyr be installed.
+
 ## What the analysis does
 1. Download the dataset if necessary
 
@@ -64,8 +66,18 @@ The script will print out to the console the steps it executes.
 
   The transformation is executed using reshape2's melt method followed by the dplyr's summarise method.
 
-9. The column variable is renamed to 'feature'
-10. The values in the column features are cleaned renamed to be more descriptive
+9. Separate the mean of the mean and the mean of the standard deviation in two columns
+  
+  Using cbind and sub, the type of estimated value (mean or std) is extracted to its own temporary column. Using
+tidyr.spread, mean and std form columns containing the mean that was associated to its row.
+
+10. Some columns are renamed.
+  The following column renames occur:
+  - variable is renamed to feature
+  - mean is renamed to avgmean
+  - std is renamed to avgstd
+  
+11. The values in the column features are cleaned renamed to be more descriptive
   
   The '.' are removed from the names, and partial words are renamed to their full word: 
   - Acc is renamed to Acceleration
@@ -73,14 +85,14 @@ The script will print out to the console the steps it executes.
   - BodyBody is renamed to Body
   - t is renamed to time
   - f is renamed to frequency
-  - mean is renamed to Mean
-  - std is renamed to StandardDeviation
   
   The final names are in camel case to ease readability.
 
-11. Write the final output to 'finalDataset.txt'
+12. Write the final output to 'finalDataset.txt'
 
   You can read the file as follows:
   ```
   > read.table('finalDataset.txt', head=TRUE)
   ```
+
+The code book is available [here](CodeBook.md).
