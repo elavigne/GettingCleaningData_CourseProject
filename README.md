@@ -82,5 +82,5 @@ The script will print out to the console the steps it executes.
 
   You can read the file as follows:
   ```
-  read.table('finalDataset.txt', head=TRUE)
+  > read.table('finalDataset.txt', head=TRUE)
   ```
